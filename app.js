@@ -4,8 +4,21 @@ const server = http.createServer((req, res) => {
   console.log("incoming request");
   console.log(req.method, req.url);
 
-  res.setHeader("Content-Type", "text/plain");
-  res.end("<h1>success</h1>");
+  if (req.method === "POST") {
+    let body = "";
+    req.on("end", () => {
+      const userName = body.split("=")[1];
+      res.end(`<h1>${userName}</h1>`);
+    });
+    req.on("data", (chunk) => {
+      body += chunk;
+    });
+  } else {
+    res.setHeader("Content-Type", "text/html");
+    res.end(
+      '<form method="POST"><input type="text" name="username"><button type="submit"> create user </button></from>'
+    );
+  }
 });
 
 server.listen(5000);
